@@ -1,8 +1,15 @@
 package Model;
 
 public class Joueur {
+    protected Color couleur;
 
-    private Color couleur = Color.BLANC;
+    protected boolean isHuman;
+
+
+    public Joueur(Color couleur){
+        this.isHuman = true;
+        this.couleur = couleur;
+    }
 
     public Color getCouleur() {
         return couleur;
@@ -10,6 +17,10 @@ public class Joueur {
 
     public void setCouleur(Color couleur) {
         this.couleur = couleur;
+    }
+
+    public boolean isHuman() {
+        return !isHuman;
     }
 
     public void next() {

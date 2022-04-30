@@ -4,11 +4,11 @@ import java.util.Arrays;
 
 public class Plateau {
 
-    private CaseOthello[][] grille = new CaseOthello[8][8];
+    private final CaseOthello[][] grille = new CaseOthello[8][8];
 
-    public void init(){
+    public void init() {
         for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++){
+            for (int j = 0; j < 8; j++) {
                 grille[i][j] = new CaseOthello();
             }
         }
@@ -18,7 +18,7 @@ public class Plateau {
         grille[4][3] = new CaseOthello(Color.NOIR);
     }
 
-    public Plateau(){
+    public Plateau() {
         init();
     }
 
@@ -28,51 +28,49 @@ public class Plateau {
     }
 
     public boolean verifierdeplacement(int indiceligne, int indicecolonne, Color couleur, boolean change) {
-        if (grille[indiceligne][indicecolonne].getCouleur() != null){
+        if (grille[indiceligne][indicecolonne].getCouleur() != null) {
             return false;
         }
-        int [] directionMax = new int[8];
+        int[] directionMax = new int[8];
         Arrays.fill(directionMax, 0);
-        boolean [] directionCheck = new boolean[8];
+        boolean[] directionCheck = new boolean[8];
         Arrays.fill(directionCheck, true);
-        int [] di = {-1, -1, 0, 1, 1, 1, 0, -1};
-        int [] dj = {0, 1, 1, 1, 0, -1, -1, -1};
-        for(int dist = 1; dist <= 8; dist++){
-            for(int direction = 0; direction < 8; direction++){
-                if (directionCheck[direction]){
+        int[] di = {-1, -1, 0, 1, 1, 1, 0, -1};
+        int[] dj = {0, 1, 1, 1, 0, -1, -1, -1};
+        for (int dist = 1; dist <= 8; dist++) {
+            for (int direction = 0; direction < 8; direction++) {
+                if (directionCheck[direction]) {
                     int newI = indiceligne + dist * di[direction];
                     int newJ = indicecolonne + dist * dj[direction];
-                    if (newI < 0 || newI >= 8 || newJ < 0 || newJ >= 8){
+                    if (newI < 0 || newI >= 8 || newJ < 0 || newJ >= 8) {
                         directionMax[direction] = 0;
                         directionCheck[direction] = false;
-                    }else{
+                    } else {
                         CaseOthello c = grille[newI][newJ];
-                        if (c.getCouleur() == null){
+                        if (c.getCouleur() == null) {
                             directionCheck[direction] = false;
                             directionMax[direction] = 0;
-                        } else if (c.getCouleur() == couleur ) {
+                        } else if (c.getCouleur() == couleur) {
                             directionCheck[direction] = false;
-                            if (!change){
+                            if (!change) {
                                 return true;
                             }
-                        }else {
+                        } else {
                             directionMax[direction]++;
                         }
                     }
                 }
             }
         }
-        if (!change){
+        if (!change) {
             return false;
         }
-        System.out.println(Arrays.toString(directionMax));
-        System.out.println(Arrays.toString(directionCheck));
         boolean flag = false;
-        for (int direction = 0; direction < 8; direction++){
+        for (int direction = 0; direction < 8; direction++) {
             int dmax = directionMax[direction];
-            if (dmax != 0){
+            if (dmax != 0) {
                 flag = true;
-                for (int k = 1; k <= dmax; k++){
+                for (int k = 1; k <= dmax; k++) {
                     int newI = indiceligne + k * di[direction];
                     int newJ = indicecolonne + k * dj[direction];
                     grille[newI][newJ] = new CaseOthello(couleur);
@@ -83,21 +81,73 @@ public class Plateau {
         return flag;
     }
 
-    public boolean next(Joueur joueur) {
-        boolean oldjoueur = false;
-        boolean nextjoueur = false;
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j < 8; j++){
-                nextjoueur = verifierdeplacement(i,j,joueur.getCouleur().next(),false);
-                if (!oldjoueur){
-                    oldjoueur = verifierdeplacement(i,j,joueur.getCouleur(), false);
+    public boolean isfinished(Joueur joueur) {
+        boolean oldjoueur = false, nextjoueur;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                nextjoueur = verifierdeplacement(i, j, joueur.getCouleur().next(), false);
+                if (!oldjoueur) {
+                    oldjoueur = verifierdeplacement(i, j, joueur.getCouleur(), false);
                 }
-                if (nextjoueur){
-                    joueur.next();
+                if (nextjoueur) {
                     return false;
                 }
             }
         }
         return !oldjoueur;
+    }
+
+    public int[] score() {
+        int[] score = new int[2];
+        for (CaseOthello[] ligne : grille) {
+            for (CaseOthello c : ligne) {
+                Color couleur = c.getCouleur();
+                if (couleur != null) {
+                    switch (couleur) {
+                        case BLANC -> score[0]++;
+                        case NOIR -> score[1]++;
+                    }
+                }
+            }
+        }
+        return score;
+    }
+
+    public int getValue(int indiceligne, int indicecolonne, Color couleur) {
+        if (grille[indiceligne][indicecolonne].getCouleur() != null) {
+            return 0;
+        }
+        int[] directionMax = new int[8];
+        Arrays.fill(directionMax, 0);
+        boolean[] directionCheck = new boolean[8];
+        Arrays.fill(directionCheck, true);
+        int[] di = {-1, -1, 0, 1, 1, 1, 0, -1}, dj = {0, 1, 1, 1, 0, -1, -1, -1};
+        for (int dist = 1; dist <= 8; dist++) {
+            for (int direction = 0; direction < 8; direction++) {
+                if (directionCheck[direction]) {
+                    int newI = indiceligne + dist * di[direction];
+                    int newJ = indicecolonne + dist * dj[direction];
+                    if (newI < 0 || newI >= 8 || newJ < 0 || newJ >= 8) {
+                        directionMax[direction] = 0;
+                        directionCheck[direction] = false;
+                    } else {
+                        CaseOthello c = grille[newI][newJ];
+                        if (c.getCouleur() == null) {
+                            directionCheck[direction] = false;
+                            directionMax[direction] = 0;
+                        } else if (c.getCouleur() == couleur) {
+                            directionCheck[direction] = false;
+                        } else {
+                            directionMax[direction]++;
+                        }
+                    }
+                }
+            }
+        }
+        int sum = 0;
+        for (int value : directionMax) {
+            sum += value;
+        }
+        return sum;
     }
 }

@@ -10,12 +10,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class View implements ActionListener {
-    private JButton[][] boutons;
-    private boolean start = false;
+    private final JButton[][] boutons;
+    private final boolean start = false;
+    private final JFrame fenetre;
 
     public View(ActionListener listener) {
 
-        JFrame fenetre = new JFrame("Fenetre");
+        fenetre = new JFrame("Fenetre");
 
         fenetre.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -40,7 +41,7 @@ public class View implements ActionListener {
             for (int j = 0; j < boutons[i].length; j++) { //Création des boutons
                 boutons[i][j] = new JButton();
                 boutons[i][j].addActionListener(listener);
-                boutons[i][j].setActionCommand(String.valueOf(i) + "-" + String.valueOf(j));
+                boutons[i][j].setActionCommand(i + "-" + j);
                 boutons[i][j].setPreferredSize(new Dimension(100, 100)); //redimensionner les boutons
                 plateau.add(boutons[i][j]);
             }
@@ -83,6 +84,7 @@ public class View implements ActionListener {
     public void afficherCoupJouer(ImageIcon image, int indiceligne, int indicecolonne) {
 //		   boutons[indiceligne][indicecolonne].setEnabled(false); //desactiver le bouton
         boutons[indiceligne][indicecolonne].setIcon(image);
+        SwingUtilities.updateComponentTreeUI(fenetre);
     }
 
     public void show(CaseOthello[][] grille) {
